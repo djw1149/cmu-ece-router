@@ -1,0 +1,313 @@
+rm -f abasm.lst abasm.obj
+/usr/ee/bin/a68 abasm,abasm,=../../m68k/dev/abasm.asm
+
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/dev/ab.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  ab.s > ab.asm
+rm -f ab.lst  ab.obj
+/usr/ee/bin/a68 ab,ab,=ab
+
+rm -f ab.s ab.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/dev/ab_io.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  ab_io.s > ab_io.asm
+rm -f ab_io.lst  ab_io.obj
+/usr/ee/bin/a68 ab_io,ab_io,=ab_io
+
+rm -f ab_io.s ab_io.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../sys/arp.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  arp.s > arp.asm
+rm -f arp.lst  arp.obj
+/usr/ee/bin/a68 arp,arp,=arp
+
+rm -f arp.s arp.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../sys/arpquery.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  arpquery.s > arpquery.asm
+rm -f arpquery.lst  arpquery.obj
+/usr/ee/bin/a68 arpquery,arpquery,=arpquery
+
+rm -f arpquery.s arpquery.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/mch/confrom.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  confrom.s > confrom.asm
+rm -f confrom.lst  confrom.obj
+/usr/ee/bin/a68 confrom,confrom,=confrom
+
+rm -f confrom.s confrom.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../sys/device.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  device.s > device.asm
+rm -f device.lst  device.obj
+/usr/ee/bin/a68 device,device,=device
+
+rm -f device.s device.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/dev/ec.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  ec.s > ec.asm
+rm -f ec.lst  ec.obj
+/usr/ee/bin/a68 ec,ec,=ec
+
+rm -f ec.s ec.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/dev/ec_io.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  ec_io.s > ec_io.asm
+rm -f ec_io.lst  ec_io.obj
+/usr/ee/bin/a68 ec_io,ec_io,=ec_io
+
+rm -f ec_io.s ec_io.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../sys/errorlog.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  errorlog.s > errorlog.asm
+rm -f errorlog.lst  errorlog.obj
+/usr/ee/bin/a68 errorlog,errorlog,=errorlog
+
+rm -f errorlog.s errorlog.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../sys/icmp.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  icmp.s > icmp.asm
+rm -f icmp.lst  icmp.obj
+/usr/ee/bin/a68 icmp,icmp,=icmp
+
+rm -f icmp.s icmp.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/dev/il.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  il.s > il.asm
+rm -f il.lst  il.obj
+/usr/ee/bin/a68 il,il,=il
+
+rm -f il.s il.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/dev/il_io.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  il_io.s > il_io.asm
+rm -f il_io.lst  il_io.obj
+/usr/ee/bin/a68 il_io,il_io,=il_io
+
+rm -f il_io.s il_io.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/mch/intr.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  intr.s > intr.asm
+rm -f intr.lst  intr.obj
+/usr/ee/bin/a68 intr,intr,=intr
+
+rm -f intr.s intr.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../sys/ip.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  ip.s > ip.asm
+rm -f ip.lst  ip.obj
+/usr/ee/bin/a68 ip,ip,=ip
+
+rm -f ip.s ip.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../sys/main.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  main.s > main.asm
+rm -f main.lst  main.obj
+/usr/ee/bin/a68 main,main,=main
+
+rm -f main.s main.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../sys/packet.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  packet.s > packet.asm
+rm -f packet.lst  packet.obj
+/usr/ee/bin/a68 packet,packet,=packet
+
+rm -f packet.s packet.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/mch/patch.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  patch.s > patch.asm
+rm -f patch.lst  patch.obj
+/usr/ee/bin/a68 patch,patch,=patch
+
+rm -f patch.s patch.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../sys/proc.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  proc.s > proc.asm
+rm -f proc.lst  proc.obj
+/usr/ee/bin/a68 proc,proc,=proc
+
+rm -f proc.s proc.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../sys/proto.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  proto.s > proto.asm
+rm -f proto.lst  proto.obj
+/usr/ee/bin/a68 proto,proto,=proto
+
+rm -f proto.s proto.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/dev/ptm.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  ptm.s > ptm.asm
+rm -f ptm.lst  ptm.obj
+/usr/ee/bin/a68 ptm,ptm,=ptm
+
+rm -f ptm.s ptm.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../sys/rcp.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  rcp.s > rcp.asm
+rm -f rcp.lst  rcp.obj
+/usr/ee/bin/a68 rcp,rcp,=rcp
+
+rm -f rcp.s rcp.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../sys/timer.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  timer.s > timer.asm
+rm -f timer.lst  timer.obj
+/usr/ee/bin/a68 timer,timer,=timer
+
+rm -f timer.s timer.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/mch/trap.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  trap.s > trap.asm
+rm -f trap.lst  trap.obj
+/usr/ee/bin/a68 trap,trap,=trap
+
+rm -f trap.s trap.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/dev/tty.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  tty.s > tty.asm
+rm -f tty.lst  tty.obj
+/usr/ee/bin/a68 tty,tty,=tty
+
+rm -f tty.s tty.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../sys/udp.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  udp.s > udp.asm
+rm -f udp.lst  udp.obj
+/usr/ee/bin/a68 udp,udp,=udp
+
+rm -f udp.s udp.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/dev/vv.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  vv.s > vv.asm
+rm -f vv.lst  vv.obj
+/usr/ee/bin/a68 vv,vv,=vv
+
+rm -f vv.s vv.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/dev/vv_io.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed  vv_io.s > vv_io.asm
+rm -f vv_io.lst  vv_io.obj
+/usr/ee/bin/a68 vv_io,vv_io,=vv_io
+
+rm -f vv_io.s vv_io.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/dev/abI.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed -f ../../m68k/util/data.sed abI.s > abI.asm
+rm -f abI.lst  abI.obj
+/usr/ee/bin/a68 abI,abI,=abI
+
+rm -f abI.s abI.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../sys/aconfI.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed -f ../../m68k/util/data.sed aconfI.s > aconfI.asm
+rm -f aconfI.lst  aconfI.obj
+/usr/ee/bin/a68 aconfI,aconfI,=aconfI
+
+rm -f aconfI.s aconfI.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../sys/arpI.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed -f ../../m68k/util/data.sed arpI.s > arpI.asm
+rm -f arpI.lst  arpI.obj
+/usr/ee/bin/a68 arpI,arpI,=arpI
+
+rm -f arpI.s arpI.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/dev/driversI.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed -f ../../m68k/util/data.sed driversI.s > driversI.asm
+rm -f driversI.lst  driversI.obj
+/usr/ee/bin/a68 driversI,driversI,=driversI
+
+rm -f driversI.s driversI.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/dev/ecI.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed -f ../../m68k/util/data.sed ecI.s > ecI.asm
+rm -f ecI.lst  ecI.obj
+/usr/ee/bin/a68 ecI,ecI,=ecI
+
+rm -f ecI.s ecI.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/dev/ilI.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed -f ../../m68k/util/data.sed ilI.s > ilI.asm
+rm -f ilI.lst  ilI.obj
+/usr/ee/bin/a68 ilI,ilI,=ilI
+
+rm -f ilI.s ilI.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/mch/intrI.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed -f ../../m68k/util/data.sed intrI.s > intrI.asm
+rm -f intrI.lst  intrI.obj
+/usr/ee/bin/a68 intrI,intrI,=intrI
+
+rm -f intrI.s intrI.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../sys/ipI.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed -f ../../m68k/util/data.sed ipI.s > ipI.asm
+rm -f ipI.lst  ipI.obj
+/usr/ee/bin/a68 ipI,ipI,=ipI
+
+rm -f ipI.s ipI.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/mch/memoryI.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed -f ../../m68k/util/data.sed memoryI.s > memoryI.asm
+rm -f memoryI.lst  memoryI.obj
+/usr/ee/bin/a68 memoryI,memoryI,=memoryI
+
+rm -f memoryI.s memoryI.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../sys/packetI.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed -f ../../m68k/util/data.sed packetI.s > packetI.asm
+rm -f packetI.lst  packetI.obj
+/usr/ee/bin/a68 packetI,packetI,=packetI
+
+rm -f packetI.s packetI.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/dev/ptmI.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed -f ../../m68k/util/data.sed ptmI.s > ptmI.asm
+rm -f ptmI.lst  ptmI.obj
+/usr/ee/bin/a68 ptmI,ptmI,=ptmI
+
+rm -f ptmI.s ptmI.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../sys/rcpI.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed -f ../../m68k/util/data.sed rcpI.s > rcpI.asm
+rm -f rcpI.lst  rcpI.obj
+/usr/ee/bin/a68 rcpI,rcpI,=rcpI
+
+rm -f rcpI.s rcpI.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/mch/trapI.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed -f ../../m68k/util/data.sed trapI.s > trapI.asm
+rm -f trapI.lst  trapI.obj
+/usr/ee/bin/a68 trapI,trapI,=trapI
+
+rm -f trapI.s trapI.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/dev/ttyI.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed -f ../../m68k/util/data.sed ttyI.s > ttyI.asm
+rm -f ttyI.lst  ttyI.obj
+/usr/ee/bin/a68 ttyI,ttyI,=ttyI
+
+rm -f ttyI.s ttyI.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../sys/udpI.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed -f ../../m68k/util/data.sed udpI.s > udpI.asm
+rm -f udpI.lst  udpI.obj
+/usr/ee/bin/a68 udpI,udpI,=udpI
+
+rm -f udpI.s udpI.asm
+/usr/ee/bin/c68 -I. -I../h -I../../h -DM68K -S ../../m68k/dev/vvI.c > /dev/null
+C-68000M 1.7.0 Copyright (c)1983 Green Hills Software, Inc.
+sed -f ../../m68k/util/M68K.sed -f ../../m68k/util/data.sed vvI.s > vvI.asm
+rm -f vvI.lst  vvI.obj
+/usr/ee/bin/a68 vvI,vvI,=vvI
+
+rm -f vvI.s vvI.asm
+rm -f router.mem router.map
+/usr/ee/bin/l68 "router-o0:x1000-m:x1000,router,=mch.obj,  version.obj, abasm.obj,  ab.obj, ab_io.obj, arp.obj, arpquery.obj, confrom.obj, device.obj,  doprintf.obj, ec.obj, ec_io.obj, errorlog.obj, globalsw.obj, icmp.obj,  ifree.obj, il.obj, il_io.obj, intr.obj, ip.obj, main.obj, malloc.obj,  memory.obj, packet.obj, patch.obj, proc.obj, procu.obj, proto.obj,  ptm.obj, queue.obj, rcp.obj, timer.obj, trap.obj, troll.obj, tty.obj,  udp.obj, vv.obj, vv_io.obj,/usr/ee/lib/crt68.obj,firstI.obj,abI.obj, aconfI.obj, arpI.obj, driversI.obj, ecI.obj, ilI.obj, intrI.obj,  ipI.obj, memoryI.obj, packetI.obj, procI.obj, ptmI.obj, rcpI.obj,  trapI.obj, trollI.obj, ttyI.obj, udpI.obj, vvI.obj,lastI.obj"
+
+rm -f router
+../util/mkhdr 1000 > router
+cat router.mem >> router
+rm -f *.lst
+chmod 776 router
+cp router /tmp/r

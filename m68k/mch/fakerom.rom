@@ -1,0 +1,76 @@
+0
+[128.2.251.250]router.tst
+[128.2.251.3]/usr/router/tboot/r236
+.
+[128.2.251.4]/usr/router/crash/ombyte.test
+.
+tt
+0
+0xFFFF01	0	0 
+.
+ptm
+0
+0xFFFF61	0	0 
+.
+# (new) Standard il configurations
+il
+0
+0xFFAAA0 0xD0000 2
+.
+il
+1
+0xFFAAB0 0xD2000 3
+.
+il
+2
+0xFFAAC0 0xD4000 4
+.
+# Old style router il configurations
+il
+0
+0xFFAAA0 0x80000 2
+.
+il
+1
+0xFFAAB0 0x90000 3
+.
+il
+2
+0xFFAAC0 0xA0000 4
+.
+# Standard ec configuration
+ec
+1
+0xC0000
+.
+ec
+1
+0xC2000
+.
+ec
+2
+0xC4000
+.
+quit
+128.2.251.236
+PI_END
+.
+y
+128.2.251.236
+PI_END
+.
+y
+128.2.251.236
+PI_END
+.
+y
+128.2.251.236
+PI_END
+.
+n
+128.2.254.36
+.
+n
+This is a confrom.
+.
+output

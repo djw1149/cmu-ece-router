@@ -1,0 +1,29 @@
+100
+[128.2.251.250]/router.tst
+[128.2.251.3]/usr/router/tboot/r236
+.
+[128.2.251.1]/tmp/dump
+.
+il
+0
+# router il card
+0xFFAAA0 0x90000  6
+.
+il
+0
+# tc il card
+0xFFAAA0 0x80000 6
+.
+ec
+0
+0xc0000
+.
+quit
+128.2.251.236
+.
+n
+128.2.254.36
+.
+n
+.
+output

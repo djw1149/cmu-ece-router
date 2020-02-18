@@ -1,0 +1,8 @@
+
+mkrom (you must be getting tired of this):
+Allow 0 in IP addresses (128.2.1.0 etc)
+explicitly remove the output file if the mkrom dies
+	(so make will remake)
+takeout (or do from the command line) the dumpfile feature
+--MM--
+

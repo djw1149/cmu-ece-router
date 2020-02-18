@@ -1,0 +1,161 @@
+/*
+ *  Autoconfigure definitions
+ *
+ **********************************************************************
+ * HISTORY
+ * 14-Dec-84  Mike Accetta (mja) at Carnegie-Mellon University
+ *	Added PI_FLAG definition [V2.0(407)].
+ *
+ * 06-Aug-84  Mike Accetta (mja) at Carnegie-Mellon University
+ *	Added new device dependent structure length field to driver
+ *	configuration parameter structure.
+ *
+ * 23-May-84  Mike Accetta (mja) at Carnegie-Mellon University
+ *	Added PI_DONE defintion.
+ *
+ * 02-Mar-84  Mike Accetta (mja) at Carnegie-Mellon University
+ *	Turned ai_flag field into ai_nunit field since it really wasn't
+ *	being used; added PI_C_ISPHYS definition.
+ *
+ * 20-Feb-84  Mike Accetta (mja) at Carnegie-Mellon University
+ *	Started history.
+ *
+ **********************************************************************
+ */
+
+#ifndef	ACMAXVEC
+
+
+
+#define	ACMAXVEC	4	/* maximum interrupt vectors per device */
+#define	ACMAXNAM	4	/* maximum device name length (bytes) */
+
+
+/*
+ *  hardware interrupt vector layout
+ */
+
+#ifdef PDP11
+struct vector
+{
+    p_int vc_pc;		/* PC to transfer to */
+    int   vc_ps;		/* PS to pick up before transfer */
+};
+#endif PDP11
+#ifdef M68K
+struct vector
+{
+    p_int vc_pc;		/* PC to transfer to */
+};
+#endif M68K
+
+#define AUTOSTRING "TCP/IP__"
+#define AUTOROM		(0xFE8000)
+#define AUTOROMDEV 	(AUTOROM + (sizeof (struct autorom) * 2))
+
+struct autoromdev {
+    char rom_ipaddr[4];
+    int rom_cable;
+    int rom_reserved[6];
+};
+
+struct autorom {
+    char rom_id[8];
+    int rom_num;
+    char rom_gway[4];
+    char *rom_boot;
+};
+
+/*
+ *  Auto-configuration driver parameter structure
+ *
+ *  Each device driver provides one of these structures to the auto-
+ *  configuration module.  This structure defines all of the common device
+ *  features for the type of device accessed through that driver.  Drivers
+ *  which do not support a particular feature or for which the feature makes no
+ *  sense will typically initialize the field to zero unless otherwise
+ *  indicated.
+ */
+
+
+
+/*
+ *  Auto-configuration identification parameter structure
+ *
+ *  An array of these structures is supplied by the device driver to the auto-
+ *  configuration module.  The array lists all the known status register
+ *  addresses at which to probe for that type of device.  The protocol
+ *  identification list is used by the auto-configuration module to intialize
+ *  various device and protocol paramaters for the device when it is found at
+ *  this address and configured into the system.
+ */  
+
+
+struct autoid
+{
+    char *ai_csr;	/* device CSR address */
+    short ai_nunit;	/* number of units on this controller (0=>not */
+			/*  a multiple unit controller */
+    char *ai_pi;	/* protocol and/or identification information */
+    char *ai_mem;	/* device memory map for onboard memory */
+    int ai_bp;		/* default interrupt level */
+};
+
+/*
+ *  Protocol/identification option codes
+ */
+#define	PI_HRD		(NPR+0)	 /* set hardware address of device */
+#define	PI_GWAY		(NPR+1)	 /* supply known IP gateway address on this */
+				 /*  directly connected network */
+#define	PI_REDIR	(NPR+2)	 /* add IP redirect mapping for an address on */
+				 /*  this directly connected network to */
+				 /*  initial routing table */
+#define	PI_CABLE	(NPR+3)	 /* set cable identification number */
+#define	PI_AUTH		(NPR+4)	 /* authorize traffic to a protocol address */
+				 /*  on a restricted cable */
+#define	PI_RESTR	(NPR+5)	 /* restrict traffic between the device and */
+				 /*  a given cable */
+#define	PI_FLAG		(NPR+6)	 /* specify device flags */
+#define	PI_C_ISME	(NPR+7)	 /* begin conditional on configured device */
+#define	PI_C_ISPHYS	(NPR+8)	 /* begin conditional on physical address */
+#define	PI_C_END	(NPR+9)	 /* end conditional interpretation */
+#define	PI_DONE		(NPR+10) /* terminate option processing */
+#define PI_ROM		(NPR+11) /* use information in rom */
+#define	PI_END		(NPR+12) /* end of option code list */
+
+
+/*
+ *  Auto-configuration intialization parameter structure
+ *  
+ *  Each driver provides one of these structures to the auto-configuration
+ *  module.  The structure provides the linkages to all of the once-only
+ *  initialization routines called by the auto-configure process to probe for,
+ *  configure, and intialize the device.
+ *
+ */
+
+struct autoconf
+{
+    pf_int ac_probe;		/* device probe routine */
+    pf_int ac_init;		/* device (hardware) initialization routine */
+    pf_int ac_once;		/* driver (software) initialization routine */
+    pf_int ac_reset;		/* device reset (non-network device only) */
+    pf_int ac_intr[ACMAXVEC];	/* interrupt vector routines */
+    pf_int ac_proc;		/* input process routine */
+    int    ac_size;		/* size of device register area in I/O page */
+    p_autoid ac_ai;		/* autoconfiguration identification info */
+    p_config ac_cf;		/* driver configuration information */
+    char   ac_name[ACMAXNAM+1];	/* device mnemonic */
+};
+
+
+/*
+ *  Flags for device probe routines
+ */
+
+#define	PB_CHECK	00	/* check that CSR is the correct device type */
+#define	PB_RESET	01	/* reset device */
+#define	PB_PROBE	02	/* generate an interrupt on device */
+#endif
+
+#define	MAXROMSZ	(sizeof arom)

@@ -1,0 +1,46 @@
+/* Trap .h */
+struct buserr {
+    u_long d0;
+    u_long d1;
+    u_long d2;
+    u_long d3;
+    u_long d4;
+    u_long d5;
+    u_long d6;
+    u_long d7;
+    u_long a0;
+    u_long a1;
+    u_long a2;
+    u_long a3;
+    u_long a4;
+    u_long a5;
+    u_long a6;
+    u_long a7;
+    u_long catchpc;
+    u_short funct;
+    u_long acc;
+    u_short ir;
+    u_short sr;
+    u_long pc;
+};
+struct except {
+    u_long d0;
+    u_long d1;
+    u_long d2;
+    u_long d3;
+    u_long d4;
+    u_long d5;
+    u_long d6;
+    u_long d7;
+    u_long a0;
+    u_long a1;
+    u_long a2;
+    u_long a3;
+    u_long a4;
+    u_long a5;
+    u_long a6;
+    u_long a7;
+    u_long catchpc;
+    u_short sr;
+    u_long  pc;
+};

@@ -1,0 +1,41 @@
+# Fake configure rom, for boot monitors w/o configure roms
+0
+# No default boot paths
+[]
+.
+# No default dump paths
+[]
+.
+# New standard il location
+il
+0
+0xFFAAA0 0xD0000 2
+.
+# Old standard il location (routers)
+il
+0
+0xFFAAA0 0x80000 2
+.
+# Old standard il location (TC's)
+il
+0
+0xFFAAA0 0x90000 2
+.
+# Standard 3 Com location
+ec
+0
+0xC0000
+.
+quit
+# Our provisional address - don't autoboot
+128.2.1.0
+PI_END
+
+.
+n
+# The CMU gateway
+128.2.254.36
+.
+n
+.
+output

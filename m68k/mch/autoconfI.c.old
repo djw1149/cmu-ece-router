@@ -1,0 +1,551 @@
+/*
+ *  Device autoconfiguration module (intialization only)
+ *
+ **********************************************************************
+ * HISTORY
+ *
+ *  2-July-86  Harold Weisenbloom(htw) and Matt Mathis(mathis)
+ * 	at Carnegie-Mellon University moved:
+ *		probe struct definition 	to intr.h
+ *		setvector			to intr.c
+ *		Ibadaddr			to trapI.c
+ *		Iprobe,Iintr			to intrI.c
+ *
+ *  12 Dec 85 Matt Mathis (mathis) at CMU
+ * 	Removed the per protocol statistics initialization.  Replaced it
+ *	with shared per device statistics, initialized in autoconf
+ *
+*/
+
+#include "../../h/rtypes.h"
+#include "../../h/queue.h"
+#include "../../h/packet.h"
+#include "../../h/proto.h"
+
+#include "../mch/mch.h"
+#include "../mch/intr.h"
+#include "../../h/devstats.h"
+#include "../mch/device.h"
+#include "../mch/autoconf.h"
+
+extern p_inter *Iprobe();
+
+extern struct autoconf *autoconf[];	/* supported devices */
+
+/*
+ *  Iconfigure - scan the driver table and probe for devices
+ *
+ *  Scan the driver configuration table to locate, configure, and initialize
+ *  all devices found on the processor.  The driver table is scanned in order
+ *  from top to bottom, looking for all possible devices for the indicated
+ *  driver before continuing with the next driver.  The auto-configuration
+ *  identification list for each driver is scanned and the driver probe routine
+ *  is called to test for a device supported by that driver at each of the
+ *  listed CSR addresses.  When a possible device is found, the driver probe
+ *  routine is called again to cause the device to interrupt and determine its
+ *  interrupt vector and BR level.
+ *  
+ *  When a device has been successfully configured in this manner, a device
+ *  structure is allocated and initialized for it.  The CSR address is recorded
+ *  there and the interrupt vector(s) are initialized to branch to the device
+ *  driver interrupt routine(s).  The device initialization routine is then
+ *  called to perform any device specific initialization (such as allocating
+ *  device dependent data structures, determining its physical network address,
+ *  etc.).
+ *  
+ *  If the device is a network device (as indicated by the presence of a common
+ *  device parameter structure), the common device parameters for this device
+ *  and driver (linkage routines, supported protocol list, phsyical address
+ *  length, etc.) are copied into the device structure.  The device structure
+ *  is then added to the global list of configured network devices.
+ *  
+ *  The device protocol/identification list is then executed to perform
+ *  initialization specific to the addressed device.  If the watchdog display
+ *  device is configured into the system and the device is a network, an entry
+ *  is made in the display queue to display its received packet count at
+ *  regular intervals.
+ *  
+ *  Finally, the input process for the device is created and if the device is
+ *  not a network it is turned on.  When all devices have been configured and
+ *  intialized, the network device list is scanned and the once-only driver
+ *  initialization routine for each network device is called after which the
+ *  device is turned on.  This last step in the configuration procedure is
+ *  delayed until all devices have been found for two reasons.  It prevents
+ *  network devices configured early in the procedure from accumulating too
+ *  many packets which cannot yet be routed and also provides the opportunity
+ *  for a device to peform the last stage of its own initialization perhaps
+ *  based on state provided by previous devices (e.g. whether a device of a
+ *  particular type was also configured).
+ *  
+ *  If a device supports multiple units (such as the DZ-11), device structures
+ *  are allocated and intialized for each existing unit (as specified in the
+ *  autoconfiguration information table).  The device structures for each unit
+ *  are allocated contiguously so that the structure for a particular unit can
+ *  be easily determined by array indexing from the address of the first
+ *  structure.
+ *
+ *  TODO: save BR level in device structure.
+ */
+
+OLDIconfigure()
+{
+    struct autoconf **acp;		/* current driver table slot */
+    struct device *dv;			/* current device */
+    struct autorom arom;		/* the header of the conf rom */
+    struct autorom *aromdev = 0;	/* points to the device table in */
+    					/* the auto config rom if the rom */
+					/* was found. otherwise it os NULL */
+
+    /*
+     *  the rom is only in the even have of memory. this will allow
+     *  use to use only one rom. we take the even bytes of rom
+     *  and load them into a local structure so that they are now
+     *  using both odd and even bytes.
+     */
+
+    romcopy ((u_short *)AUTOROM, (u_char *)&arom, sizeof arom);
+
+    /* first 8 bytes of rom is AUTOSTRING if the rom exists */
+
+    if ((bcmp (AUTOSTRING, arom.rom_id, (sizeof arom.rom_id)) == 0) &&
+        (arom.rom_num) > 0)
+    {
+       register u_char *b = (u_char *)arom.rom_gway;
+       aromdev = (struct autoromdev *)AUTOROMDEV;
+       cprintf ("Configure rom at location %x\r\n", (char *)AUTOROM);
+       cprintf ("Default gateway %d.%d.%d.%d\r\n", b[0],b[1],b[2],b[3]);
+       Iipkngw(arom.rom_gway);
+    }
+       
+    for (acp=autoconf; *acp; acp++)
+    {
+	struct autoconf *ac = *acp;	/* current driver parameters */
+	struct autoid *ai = ac->ac_ai;	/* current identification list */
+	
+	for (; ai->ai_csr; ai++)
+	{
+	    p_inter *pb;		/* Iprobe() return structure */
+	    short *wp;			/* word pointer for NXM check */
+	    int nunit;			/* number of units on device */
+	    int nvec;			/* number of device intr vectors */
+	    int ddlen;			/* device dependent fields length */
+	    int i;
+
+	    if (!(*(ac->ac_probe))(ai, PB_CHECK))
+		continue;
+	    cprintf("%s at csr %x ", ac->ac_name, ai->ai_csr);
+	    if (ac->ac_intr[0] != 0)
+	    {
+		pb = Iprobe(ac, ai);
+		if (pb == 0)
+		   continue;
+		cprintf("vector %d, br%d ",
+			pb->pb_vector, (pb->pb_br/PS_BR1)&0xf);
+	    }
+	    else
+	         pb = 0;
+	    nunit = ai->ai_nunit;
+	    if (nunit <= 0)
+		nunit = 1;
+	    if (ac->ac_cf)
+		ddlen = (sizeof(*dv)-sizeof(dv->dv_devdep)) +
+			ac->ac_cf->cf_ddlen;
+	    else
+	         ddlen = sizeof(dv->dv_common);
+	    dv = (struct device *)zalloc(ddlen*nunit);
+	    if (dv == 0)
+		panic("Iconfigure dv");
+	    for (nvec=0; nvec<ACMAXVEC && ac->ac_intr[nvec]; nvec++)
+		setvector(pb, ac->ac_intr[nvec], dv);
+	    for (i=0; i<nunit; i++)
+	    {
+		dv->dv_pb = pb;
+		dv->dv_addr = ai->ai_csr;
+		dv->dv_mem  = ai->ai_mem;
+		dv->dv_nunit = ai->ai_nunit;
+		if (ac->ac_cf != 0)
+		{
+		    initdevice(dv);
+		    dv->dv_phys[0] = i;
+		    dv->dv_cf = *(ac->ac_cf);
+		    dv->dv_next = dvhead;
+		    dvhead = dv;
+		    dv->dv_ddlen = ddlen;
+		}
+		(*(ac->ac_init))(dv, pb);
+		OLDIdvproto(dv, ai->ai_pi, aromdev);
+#if	C_WT > 0
+		if (ac->ac_cf != 0)
+		    wtmake(&((union longval *)(dv->dv_cnt.dvu_cnt))->lv_loword,
+			   2, (dv->dv_cable<<4)|0xf, (dv->dv_cable<<4)|0xf);
+#endif	C_WT
+		if (ac->ac_proc && makeproc(ac->ac_proc, dv) == 0)
+		    panic("Iconfigure proc");
+		if (ac->ac_reset)
+		    (*(ac->ac_reset))(dv, DVR_ON);
+		((char *)dv) += ddlen;
+	    }
+	    cprintf("\r\n");
+	out:;
+	}
+    }
+    for (dv=dvhead; dv; dv=dv->dv_next)
+    {
+	/*
+ 	 *  Perform any driver specific software initialization.
+	 */
+	for (acp=autoconf; *acp; acp++)
+	{
+	    struct autoconf *ac = *acp;
+
+	    if (ac->ac_cf &&
+		ac->ac_cf->cf_type == dv->dv_type &&
+		ac->ac_once)
+		(*(ac->ac_once))(dv);
+	}
+	if (dv->dv_reset)
+	    (*(dv->dv_reset))(dv, DVR_ON);
+    }
+}
+
+/*
+ * routine Idvproto
+ *	If a pi structure exists for this device, then it
+ *	is a network device. otherwise return immediately.
+ *	If arom is not NULL, then we are configuring from a
+ *	rom so call Idvrom.
+ *	Otherwise we have a pi structure so call Idvexec to
+ *	execute the pi commands.
+ */
+
+OLDIdvproto (dv, pi, arom)
+register struct device *dv;
+char *pi;
+struct autorom *arom;
+{
+    if (pi == 0)
+       return;
+
+    if (arom)
+       Idvrom(dv, arom);
+
+    else OLDIdvexec (dv, pi);
+    OLDIdvattach(dv);
+}
+
+
+/*
+ *  Idvexec - initialize device protocol and/or identification information
+ *
+ *  dv = device structure to initialize
+ *  pi = protocol identification description
+ *
+ *  Execute the device protocol identification list (see description for each
+ *  op code below).  This list is provided as an array of bytes since this is
+ *  the only way it may be conveniently initialized by the various device
+ *  drivers.  
+ *  
+ *  TODO: fix protocol initialization to consistently test for protocol in the
+ *	    protocol specific initialization routine.
+ */
+OLDIdvexec(dv, pi)
+register struct device *dv;
+register char *pi;
+{
+    int cond = 0;	/* conditional execution mask (0=>okay, else=> */
+			/*  execution currently suppressed), nesting */
+			/*  is accomplished by shifting the bit mask */
+			/*  left one bit for each new level and turning */
+			/*  on the low order bit */
+
+    if (pi == 0)
+       return;
+
+    dv->dv_cable = -1;
+    while (*pi != PI_END)
+    {
+	switch (*pi)
+	{
+	    /*
+	     *  Conditionally execute following operations only if we are on
+	     *  the specified cable (and optionally) have the indicated
+	     *  physical address (if the address length is not zero).
+	     *
+	     *  Format: ISME, <cable-number>, <address-length>,
+	     *                <address-byte>, ...
+	     */
+	    case PI_C_ISME:
+	    {
+		struct device *dvt;
+
+		pi++;
+		for (dvt=dvhead; dvt; dvt=dvt->dv_next)
+		    if (dvt->dv_cable == *pi)
+		    {
+			if (*(pi+1) == 0 || isme(dvt, pi+2))
+			{
+			    cond <<= 1;
+			    break;
+			}
+		     }
+		if (dvt == 0)
+		    cond = (cond<<1)|1;
+		pi += *++pi + 1;
+		break;
+	    }
+
+	    /*
+	     *  Conditionally execute following operations only if we have the
+	     *  specified physical address.
+	     *
+	     *  Format: ISPHYS, <address-byte>, ...
+	     */
+	    case PI_C_ISPHYS:
+	    {
+		if (isme(dv, ++pi))
+		    cond <<= 1;
+		else
+		    cond = (cond<<1)|1;
+		pi += dv->dv_hln;
+		break;
+	    }
+
+	    /*
+	     *  End the most recent conditional execution (nesting is limited
+	     *  by the number of bits in a word).
+	     *
+	     *  Format: END
+	     */
+	    case PI_C_END:
+		pi++;
+		cond >>= 1;
+		break;
+
+	    /*
+	     *  Set the physical hardware address of the device.
+	     *
+	     *  Format: HRD, <address-byte>, ...
+	     */
+	    case PI_HRD:
+		pi++;
+		if (!cond)
+		{
+		    bcopy(pi, dv->dv_phys, dv->dv_hln);
+		}
+		pi += dv->dv_hln;
+		break;
+
+	    /*
+	     *  Supply the IP address of a well-known gateway on this network.
+	     *
+	     *  Format: GWAY, <address-byte>, ...
+	     */
+	    case PI_GWAY:
+		pi++;
+		if (!cond)
+		    Iipkngw(pi);
+		pi += PRL_IP;
+		break;
+
+	    /*
+	     *  Supply a permanent redirection for an IP address to a
+	     *  particular gateway address.
+	     *
+	     *  Format: REDIR, <routing-entry-flags>,
+	     *		       <address-byte>, ..., <address-byte>
+	     *		       <gateway-byte>, ..., <gateway-byte>
+	     */
+	    case PI_REDIR:
+		pi++;
+		if (!cond)
+		    Iipredir(pi[0], pi+1, pi+1+PRL_IP, dv);
+		pi += 1+PRL_IP+PRL_IP;
+		break;
+
+	    /*
+	     *  Set the cable number of this device.
+	     *
+	     *  Format: CABLE, <number>
+	     */
+	    case PI_CABLE:
+		pi++;
+		if (!cond)
+		{
+		    dv->dv_cable = *pi;
+		}
+		pi++;
+		break;
+
+	    /*
+	     *  Set this cable restricted for indicated protocol.
+	     *
+	     *  Format: RESTR, <protocol>
+	     */
+	    case PI_RESTR:
+	    {
+		int pr = *++pi;
+
+		if (!cond)
+		{
+		    dv->dv_restr[pr] = TRUE;
+		}
+		pi++;
+		break;
+	    }
+
+	    /*
+	     *  Authorize an address for unrestricted communication.
+	     *
+	     *  Format: AUTH, <protocol-number>,
+	     *		      <address-byte>, ..., <address-byte>
+	     */
+	    case PI_AUTH:
+	    {
+		int pr = *++pi;
+
+		pi++;
+		if (!cond)
+		{
+		    Irsdv(dv, pr, pi);
+		}
+		pi += proto[pr].pr_pln;
+		break;
+	    }
+
+	    /*
+	     *  Specify device independent flag(s).
+	     *
+	     *  Format: FLAG, <flag(s)>
+	     */
+	    case PI_FLAG:
+	    {
+		pi++;
+		if (!cond)
+		{
+		    dv->dv_flag |= *((u_char *)pi);
+		}
+		pi++;
+		break;
+	    }
+
+	    /*
+	     *  Prematurely complete initialization processing (e.g.  within a
+	     *  conditional).
+	     *
+	     *  Format: DONE
+	     */
+	    case PI_DONE:
+		if (!cond)
+		{
+		    cond = 0;
+		    goto done;
+		}
+		pi++;
+		break;
+
+	    /*
+	     *  Set protocol address of this device.
+	     *
+	     *  Format: <protocol-number>, <address-byte>, ..., <address-byte>
+	     */
+	    default:
+	    {
+		int pr = *pi++;
+
+		if (pr < 0 || pr >= NPR)
+		    panic("pi bad praddr");
+		if (!cond)
+		    bcopy(pi, &dv->dv_praddr[proto[pr].pr_aofs], proto[pr].pr_pln);
+		pi += proto[pr].pr_pln;
+		break;
+	    }
+	}
+    }
+done:
+    if (cond)
+	panic("pi cond");
+}
+
+/*
+ * routine Idvattach
+ *	attach configured device to protocol drivers for IP and
+ *	ARP. (note: this use to be part of Idvproto.
+ */
+
+OLDIdvattach (dv)
+register struct device *dv;
+{
+    switch(dv->dv_hln)
+    {
+	case 1:
+	    cprintf(dv->dv_type == DVT_3ETHER?"0%o":"%d",
+		    (u_char)dv->dv_phys[0]);
+	    break;
+	default:
+	    cprintf("%s", pa_fmt(dv->dv_phys, dv->dv_hln));
+    }
+    if (dv->dv_cable < 0)
+	panic("no cable");
+    cprintf(" cable %d", dv->dv_cable);
+
+    dv->dv_cnts = (struct devstats *)zalloc(sizeof(struct devstats));
+    if (dv->dv_cnts == 0)
+	panic("Idvattach devstats");
+
+    Iardv(dv);
+    if (dv->dv_pr[PR_IP])
+    {
+	Iipdv(dv);
+	if (dv->dv_restr[PR_IP])
+	    cprintf(" (restricted IP)");
+    }
+#if	C_CHAOS > 0
+    if (dv->dv_pr[PR_CHAOS])
+    {
+	Icndv(dv);
+    }
+#endif	C_CHAOS
+}
+
+
+
+static void romcopy(s, d, n)
+register u_short *s;
+register u_char *d;
+register n;
+{
+    while (n--)
+    	*d++ = *s++;	/* this ignores the high byte of the word */
+
+}
+
+
+/* djw: pulled back from intrI.c, NUKED in aconfI.c: */
+
+/*
+ * routine Idvrom.
+ *	configure network device from the auto config rom.
+ *	-get the device's ip address.
+ *	-get the device's cable number.
+ */	
+
+Idvrom (dv, ardev)
+register struct device *dv;
+register struct autoromdev *ardev;
+{
+    register struct autoromdev arom;
+    register int index = 6 - ((dv->dv_pb -> pb_br/PS_BR1) & 0xf);
+  
+    if (index < 0 || index > 7)
+	return;
+
+    romcopy ((u_short *)&ardev[index * 2], (u_char *)&arom, sizeof arom);
+
+    bcopy(arom.rom_ipaddr, &dv->dv_praddr[proto[PR_IP].pr_aofs], 4);
+
+    if (arom.rom_cable)
+       dv->dv_cable = arom.rom_cable;
+
+    /* future authorize and restrict goes here */
+}
+

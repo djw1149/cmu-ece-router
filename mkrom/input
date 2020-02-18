@@ -1,0 +1,25 @@
+99
+[128.2.251.1]/tmp/boot1
+[128.2.251.2]/tmp/boot2
+.
+[128.2.251.1]/tmp/dump
+.
+il
+0
+100 200 300
+.
+ec
+1
+101 201 301 401
+.
+quit
+128.2.251.1 sub8 123 4 5
+.
+y
+128.2.251.238 strict8 strict8 4
+.
+n
+this is text
+this is text
+.
+output

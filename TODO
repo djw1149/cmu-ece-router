@@ -1,0 +1,14 @@
+		TTTTTTTT OOOOOO DDDDD   OOOOOO
+		    T	 O    O D    D  O    O
+		    T	 O    O D    D  O    O
+		    T	 O    O D    D  O    O
+		    T	 O    O D    D  O    O
+		    T	 OOOOOO DDDDD   OOOOOO
+
+------------------------------------------------------Sat Oct 11 00:19:36 1986
+ci the following:
+
+DONE--sys/ipI.c
+sys/packetI.c
+dev/*I.c
+mch/* that is writable by djw

@@ -1,0 +1,7 @@
+	SECTION 9
+
+	XDEF exit
+exit	MOVE.L	$20000,A7
+        MOVE.L	$20004,A0
+	JMP	(A0)
+	END

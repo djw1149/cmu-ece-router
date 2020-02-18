@@ -1,0 +1,174 @@
+
+Received: from faraday.ECE.CMU.EDU by ampere.ECE.CMU.EDU (4.12/4.7)
+	id <AA24257 mathis@faraday.ECE.CMU.EDU>; Wed, 1 Oct 86 18:38:15 edt;
+Received: by faraday.ECE.CMU.EDU (4.12/4.7)
+	id <AA03130 mathis>; Wed, 1 Oct 86 18:31:48 edt;
+Date: Wednesday, 1 October 1986 18:31:44 EDT
+Sender: Matt.Mathis@faraday.ECE.CMU.EDU
+From: Matt.Mathis@faraday.ece.cmu.edu
+To: bohman@faraday.ece.cmu.edu, gregg@gauss.ece.cmu.edu,
+        djw@ampere.ece.cmu.edu, ddp@andrew.cmu.edu, tjh@andrew.cmu.edu,
+        leong@andrew.cmu.edu
+Subject: Proposed new router/TC configuration spec
+Message-Id: <1986.10.1.22.20.59.Matt.Mathis@faraday>
+Status: R
+
+Please comment.
+Tom - can I enlist you to document the rest of the processor card
+strapping as it is currently done?  - Thanks.
+--MM--
+****************************************************************
+Standard multibus/Ombyte card strapping specifications for routers and
+terminal concentrators.
+
+********Backplane configuration:
+
+Ground BPRN on the highest priority slot.  (DMA arbitration)
+
+It is desirable to be able to assert INT7 on the backplane as an attention
+signal.   This is not required, but strongly suggested.
+
+The cards shall be installed in the following order:
+	(Highest priority, BPRN grounded)
+	Most congested interlan
+	Less congested interlans
+	Processor
+	pronet
+	octal tty cards
+	3com cards
+
+********Processor strapping
+
+Interupt strapping:	(Standard or default)
+Source		CPU level	TC use		Router use
+INT7		IRQ7		invoke DDT	Force manual boot
+clock (K16-8)	IRQ6		system clock	system clock
+INT2		IRQ5		Network		Most congested network
+INT3		IRQ4		-		Network
+INT4		IRQ3		tty		Network
+INT5		IRQ2		Octal tty	Least congested network
+console(K15-11)	IRQ1		console		console
+
+This configuration is optimal for the TC's and close to optimal for the
+routers.  Since the routers autoconfigure the IRQ's they, can be custom
+configured for slightly better performance.   Optimal strapping for routers:
+IRQ1: console, IRQ2:clock, IRQ7:INT7, IRQ3-6 connected to INT2-5, ranked by
+congestion at each interface.
+
+Processor memory map: see OB68K1A manual for Map1 (See figure 6.1.2).
+
+On board devices:  see OB68K1A manual (figure 6.2).  XX=0xFF, ie:
+ACIA0 is at 0xFFFF01 etc.
+
+/******** The processor strapping needs to be fully spec'ed ********/
+
+********Run time environment
+The boot monitor shall set up the following environment prior to starting
+the router/TC:
+
+The stack base (pushed first) is 8k bytes below the top of contigious 'main'
+memory.  The 8k space can be used for a buffer to save crash information
+across boots.   All of the buffers etc. used by the boot monitor reside
+within the stack, so it can be very large.
+
+/***** DJW: can you measure/estimate the stack space needed? *****/
+
+The router/TC is started as a procedure call on this stack.
+
+Interupt/trap vectors are loaded as the boot monitor needs them.
+In particular, IRQ7 (Abort), will invoke a manual boot.   In boot monitors
+without versabug, all other interupts will cause an auto boot.  It is assumed
+that the TC/router will reinitialize any vectors that it needs.
+
+Space reserved for versabug is not disturbed by the boot monitors (0x400 -
+0x7ff)
+
+At location 0x800 is a pointer to a structure resembling a bootp reply
+packet (even if bootp was not used).  The following fields are guaranteed to
+be filled in, others will be filled in only if bootp was actually used
+(zeroed if bootp was not used).  Note that the bootp structure will reside
+somewhere within the boot monitors stack. 
+/*********** DJW fill this in *********/
+
+Locations 0x800 - 0x840 are used by the boot monitor for globals.  In
+general no memory is altered outside of these globals, the stack and the
+area being loaded.
+
+********Boot locations
+Standard boot file locations: (assuming not using bootp)
+
+gauss:/usr/router/boot/<name>
+thor:/usr/ece/router/boot/<name>
+cavalry:<pcname>
+/***** Is cavalry a good name? We need a non-subnet address for it ****/
+The names shall be in the form:
+
+		<name>		<pcname>
+ECE router	ombyte.ece	ECE.RTE
+CC routers	ombyte.cc.99	CC99.RTE
+ECE TC's	conc.fe99	ECE99.TCS
+CC TC's		conc.cc.99	CC99.TCS
+
+On the unix systems it should be assumed that the above names are links
+to the actual binarys.  This feature is designed to be used for version
+control: any one box can autoboot a test version without disturbing
+any others.
+
+********Network devices
+Note on device strapping: the current routers and TC's have device addressing
+configurations compiled in.  The new boot monitors get their the device
+addresses from configure roms which can be altered on a per-system basis.
+Future routers will also use this information.   TC's might not(?)
+
+To guarantee unambigious subnet configurations the routers forbid network
+devices from sharing minor unit numbers.   If there is an il0 then there
+must not be an ec0, etc.   Conflicting minor unit numbers can be present in
+the configure roms (and in fact within a device type), but the actual
+devices must not be present.
+
+Interlan cards (il)
+Unit	CSR	Intr	Aux memory
+il0	FFAAA0	INT2	D0000
+il1	FFAAB0	INT3	D2000
+il2	FFAAC0	INT4	D4000
+
+Routers may also autoconfigure:
+il0	FFAAA0	INT2	80000		Backward compatible for routers only
+il1	FFAAB0	INT3	90000		Backward compatible for routers only
+il2	FFAAC0	INT4	A0000		Backward compatible for routers only
+
+TC may also configure:
+il0	FFAAA0	INT2	90000		Backward compatible for TC's only
+
+3com cards (ec)  Warning: suitable only for low performance use.
+(ec0 and ec1 are backwards compatible with ec0 and ec2 in the old
+router configurations).
+
+Unit	CSR/mem	Intr
+ec0	C0000	INT2			Factory standard (?)
+ec1	C2000	INT3
+ec2	C4000	INT4
+
+pronet cards (vv) Warning: subject to vanishing.
+
+Unit	CSR/mem	Intr
+vv4	E0000	INT5			Note: some are strapped INT2
+
+********Other devices (TC's only)
+
+Octal tty cards
+Unit	CSR	INTR
+ty0	FF0100	INT5 (partyline)
+ty1	FF0200	INT5 (partyline)
+ty2	FF0300	INT5 (partyline)
+/***************** is ty a good name? ****************/
+Other octal card features:
+
+The TC drivers will support full modem control.  To disable it, the carrier
+sense signal must be tied high on each channel.
+
+The TC drivers have an input quench feature: If the number of characters
+received exceeds 65 per second, that receive channel is disabled for one
+second.   This will permit 600 baud kermit transfers, but no faster.
+
+

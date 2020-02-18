@@ -1,0 +1,54 @@
+		DDDD     OO   N   N  EEEE
+		D   D   O  O  NN  N  E
+		D   D   O  O  N N N  EE
+		D   D   O  O  N  NN  E
+		DDDD     OO   N   N  EEEE
+
+
+DONE-- /../eea/usr/mathis/rtr/sys/aconfI.c check .h file
+DONE-- old Iconfigure>> OLDIconfigure()
+DONE-- new one should call oldconfigure if no newconfrom present
+---
+DONE--use fakerom to find other devices that aren't in the real rom's list
+	(tty...)
+
+DONE-- rom code should be a separate module
+
+DONE--new module: patch code- by <romserial#,minor#> give a new net structure
+
+DONE--restore pi structure- make sure that there is an opcode for 
+ supply.well.known.gateway. If there are some bad dependencies on opcodes, ask
+ matt about punting them
+ 
+DONE--new probe order: do all check then all probes
+ allocate dv's into a list- but later all  non-net devices must be purged from
+ the list.
+
+-------------------------------------------------Thu Sep 18 13:00:10 EDT 1986
+DONE(matt)-- probe stuff - nxmok both ilcsr and ilbuffer
+	ci this from matt
+
+
+
+DONE-- move aconf.h to /h
+
+NOT ME-- fix p_csr because of IBM or maybe p_dev
+
+
+QUESTION >> how do i handle nunits in autoids?  
+QUESTION >> how do i handle cables?
+QUESTION >> how do i differentiate network devices from others in the rom?
+	 -> probably by the autoconf structure
+
+DONE-- Make an p_autorom -> far on a pc.
+
+
+DONE--check pi running code.
+
+DONE--Make mkrom subxx use proper pi codes.
+
+DONE--add an il @ 0xd000000000000000000000000000.
+
+DONE--fix not to allow duplicate minor numbers
+
+DONE--fix in confrom.c the "TEMPORARY HACK"

@@ -1,0 +1,55 @@
+14a15
+> #include "../../h/time.h"
+16d16
+< #include "../h/time.h"
+22c22
+< #include "../mch/autoconf.h"
+---
+> #include "../../h/aconf.h"
+24a25
+> 
+29a31
+> #if 0
+38a41
+> #endif 0
+40d42
+< 
+61c63
+<     ptmautoid,		/* autoconfiguration identification */
+---
+> /*    ptmautoid,		 autoconfiguration identification */
+66,67c68,72
+< 
+< 
+---
+> /*
+>  * nprobe keeps us from reseting the acia if the we are
+>  * probing the console. Otherwise we loose the last char or so
+>  */
+> static int nprobe = 0;
+69c74
+< register struct autoid *ai;
+---
+> register long **ai;
+71c76
+<     register struct ptmdevice *ptm = (struct ptmdevice *)ai->ai_csr;
+---
+>     register struct ptmdevice *ptm = (struct ptmdevice *)*ai;
+73c78,80
+< 
+---
+> /* cprintf("ptmprobe@%x\r\n", ptm); */
+>     if(NXM_check(ptm ,sizeof(struct ptmdevice)))
+> 	return(0);
+79a87,90
+> 	    ptm->ptm_csr2 = PTM_REG1;
+> 	    ptm->ptm_csr1 = PTM_DISABLE;
+> 	    i = ptm->ptm_csr2;
+> 	    i = ptm->ptm_msb1;
+83c94,97
+< 	    Iintr(1);	/* fakeit */
+---
+> 	    ptm->ptm_csr2 = PTM_REG1;
+> 	    ptm->ptm_msb1 = 0;
+> 	    ptm->ptm_cnt1 = 1;
+> 	    ptm->ptm_csr1 = PTM_CONT|PTM_NORESET|PTM_IRQENA|PTM_INTERN;

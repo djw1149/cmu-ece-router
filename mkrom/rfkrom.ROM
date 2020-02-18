@@ -1,0 +1,76 @@
+99
+[128.2.251.250]/router.tst
+[128.2.251.3]/usr/router/tboot/r236
+.
+[128.2.251.1]/tmp/dump
+.
+tt
+0
+0xFFFF01	0	0 
+.
+ptm
+0
+0xFFFF61	0	0 
+.
+il
+0
+0xFFAAA0	0x80000	6 
+.
+il
+0
+0xFFAAA0	0x90000	6
+.
+il
+1
+0xFFAAB0	0x90000	3
+.
+il
+2
+0xFFAAB0	0xA0000	2
+.
+il
+2
+0xFFAAC0	0xA0000	4
+.
+il
+2
+0xFFAAC0	0xB0000	2
+.
+ec
+0
+0x00c0000	0	3
+.
+ec
+1
+0x00d0000	0	4
+.
+ec
+2
+0x00c2000	0	2
+.
+vv
+3
+0x0E0000	0	3
+.
+quit
+128.2.251.236
+PI_END
+.
+y
+128.2.251.236
+PI_END
+.
+y
+128.2.251.236
+PI_END
+.
+y
+128.2.251.236
+PI_END
+.
+n
+128.2.254.36
+.
+n
+.
+output

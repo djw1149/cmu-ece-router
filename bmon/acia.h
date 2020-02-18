@@ -1,0 +1,3 @@
+struct accb {
+    int a;
+};

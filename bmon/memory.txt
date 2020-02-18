@@ -1,0 +1,3 @@
+lowest used is 1c3cd
+
+lowest local in main() at 0x1dfec
